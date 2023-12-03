@@ -4,6 +4,6 @@
 Console.WriteLine("Advent of Code 2023");
 Console.WriteLine("===================");
 
-AdventOfCode2023.Day02.Solve();
+AdventOfCode2023.Day03.Solve();
 
 Console.ReadLine();
