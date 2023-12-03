@@ -1012,32 +1012,30 @@ sevenfourfour99seven8
 ktgfiveone76ghj
 7zgzsevenftkdfour186";
 
+	string[] digitWords = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+
 	var calibrationSum = 0;
 	foreach(var line in calibrationDocument.Split(Environment.NewLine))
 	{
-		var length = line.Length;
-
 		char? firstDigit = null;
-		for(var ch = 0; ch < length; ch++)
+		for(var ch = 0; ch < line.Length; ch++)
 		{
-			if (Char.IsDigit(line[ch]))
+			if(TryGetDigit(line, ch, out firstDigit))
 			{
-				firstDigit = line[ch];
 				break;
-			}
+			};
 		}
 		
 		char? lastDigit = null;
-		for(var ch = length -1; ch >= 0; ch--)
+		for(var ch = line.Length - 1; ch >= 0; ch--)
 		{
-			if (Char.IsDigit(line[ch]))
+			if (TryGetDigit(line, ch, out lastDigit))
 			{
-				lastDigit = line[ch];
 				break;
-			}
+			};
 		}
 
-		if(!firstDigit.HasValue || !lastDigit.HasValue)
+		if (!firstDigit.HasValue || !lastDigit.HasValue)
 		{
 			throw new Exception("Invalid calibration document");
 		}
@@ -1048,5 +1046,33 @@ ktgfiveone76ghj
 	}
 
 	Console.WriteLine($"Sum: {calibrationSum}");
+
+	bool TryGetDigit(string line, int charIndex, out char? digit)
+	{
+		if (Char.IsDigit(line[charIndex]))
+		{
+			digit = line[charIndex];
+			return true;
+		}
+
+		for (int dw = 0; dw < digitWords.Length; dw++)
+		{
+			var digitWord = digitWords[dw];
+			var digitValue = (char)('1' + dw);
+			{
+				if (charIndex + digitWord.Length <= line.Length)
+				{
+					if (digitWord == line.Substring(charIndex, digitWord.Length))
+					{
+						digit = digitValue;
+						return true;
+					}
+				}
+			}
+		}
+
+		digit = null;
+		return false;
+	}
 }
 
