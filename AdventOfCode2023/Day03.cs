@@ -153,6 +153,7 @@
 			int columns = matrix.GetLength(1);
 
 			int numberSum = 0;
+			var gearParts = new Dictionary<(int row, int column), List<int>>();
 
 			int row = 0;
 			while (row < rows)
@@ -164,36 +165,50 @@
 				{
 					if (Char.IsDigit(matrix[row, column]))
 					{
-						var number = $"{matrix[row, column]}";
+						var numberString = $"{matrix[row, column]}";
 						var beginColumn = column++;
 						while (column < columns && Char.IsDigit(matrix[row, column]))
 						{
-							number += $"{matrix[row, column]}";
+							numberString += $"{matrix[row, column]}";
 							column++;
 						}
+
 						var endColumn = column - 1;
+						var number = Convert.ToInt32(numberString);
 
 						var foundSymbol = false;
-						for (int scanRow = row - 1; !foundSymbol && scanRow <= row + 1; scanRow++)
+						for (int scanRow = row - 1; scanRow <= row + 1; scanRow++)
 						{
 							if (scanRow >= 0 && scanRow < rows)
 							{
-								for (int scanColumn = beginColumn - 1; !foundSymbol && scanColumn <= endColumn + 1; scanColumn++)
+								for (int scanColumn = beginColumn - 1; scanColumn <= endColumn + 1; scanColumn++)
 								{
 									if (scanColumn >= 0 && scanColumn < columns)
 									{
 										// TODO: Optimize by skipping the number cells
 										var scanCharacter = matrix[scanRow, scanColumn];
-										foundSymbol = scanCharacter != '.' && !Char.IsDigit(scanCharacter);
+										foundSymbol |= scanCharacter != '.' && !Char.IsDigit(scanCharacter);
+
+										if (scanCharacter == '*')
+										{
+											if (gearParts.ContainsKey((scanRow, scanColumn)))
+											{
+												gearParts[(scanRow, scanColumn)].Add(number);
+											}
+											else
+											{
+												gearParts.Add((scanRow, scanColumn), [number]);
+											}
+										}
 									}
 								}
 							}
 						}
+						
 						Console.WriteLine($"Found number: {number} on row {row} in columns {beginColumn}-{endColumn} (surrounding symbol: {foundSymbol}");
-
 						if(foundSymbol)
 						{
-							numberSum += Convert.ToInt32(number);
+							numberSum += number;
 						}
 					}
 
@@ -203,7 +218,18 @@
 				row++;
 			}
 
-			Console.WriteLine($"Solution: {numberSum}");
+			var ratioSum = 0;
+			foreach(var gearPart in gearParts)
+			{
+				Console.WriteLine($"Found gear at {gearPart.Key.row}, {gearPart.Key.column} with {gearPart.Value.Count} parts");
+				if(gearPart.Value.Count == 2)
+				{
+					var ratio = gearPart.Value[0] * gearPart.Value[1];
+					ratioSum += ratio;
+				}
+			}
+
+			Console.WriteLine($"Solution: {numberSum}, {ratioSum}");
 		}
 
 		static char[,] GetMatrix(string schematic)
