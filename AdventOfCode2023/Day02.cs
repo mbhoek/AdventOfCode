@@ -114,7 +114,7 @@ Game 100: 6 green, 15 red, 12 blue; 9 red; 16 red; 17 red, 3 blue, 7 green";
 			// 12 red cubes, 13 green cubes, and 14 blue cubes
 			(int Red, int Green, int Blue) bagContents = (12, 13, 14);
 
-			var idSum = 0;
+			int idSum = 0, powerSum = 0;
 			foreach (var game in games.Split(Environment.NewLine))
 			{
 				Console.WriteLine(game);
@@ -171,14 +171,17 @@ Game 100: 6 green, 15 red, 12 blue; 9 red; 16 red; 17 red, 3 blue, 7 green";
 				}
 
 				var possible = (red <= bagContents.Red && green <= bagContents.Green && blue <= bagContents.Blue);
-				Console.WriteLine($"{id}: {red}, {green}, {blue} ({maxCubeCount}): {possible}");
+				var power = red * green * blue;
+				Console.WriteLine($"{id}: {red}, {green}, {blue} ({maxCubeCount}): {possible} ({power})");
+
 				if(possible)
 				{
 					idSum += id;
 				}
+				powerSum += power;
 			}
 
-			Console.WriteLine($"Solution: {idSum}");
+			Console.WriteLine($"Solution: {idSum}, {powerSum}");
 		}
 	}
 }
