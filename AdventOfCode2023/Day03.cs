@@ -158,8 +158,6 @@
 			int row = 0;
 			while (row < rows)
 			{
-				Console.WriteLine($"Looking at row {row}");
-
 				int column = 0;
 				while (column < columns)
 				{
@@ -172,7 +170,6 @@
 							numberString += $"{matrix[row, column]}";
 							column++;
 						}
-
 						var endColumn = column - 1;
 						var number = Convert.ToInt32(numberString);
 
@@ -211,10 +208,8 @@
 							numberSum += number;
 						}
 					}
-
 					column++;
 				}
-
 				row++;
 			}
 
