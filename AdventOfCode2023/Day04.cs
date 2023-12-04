@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace AdventOfCode2023
@@ -211,12 +212,17 @@ Card 198: 90 56  5 35 91 61  7 20 68 40 | 17 47 66 10 73  8 51 13 53 58 45 36 34
 Card 199: 16 23 27 61 14 11 89 80 98 88 | 57 48 25 66 72 45  2 33 93  9 73 58 94 79 40  6 47 19 78 69 70  8 30 29 34";
 
 			var pilePoints = 0L;
-			foreach(var card in pile.Split(Environment.NewLine))
+			var cardWinners = new Dictionary<int, int>();
+			foreach (var card in pile.Split(Environment.NewLine))
 			{
 				var cardParts = card.Split(':', StringSplitOptions.TrimEntries);
 				Debug.Assert(cardParts.Length == 2);
 				var cardInfo = cardParts[0];
 				var cardNumbers = cardParts[1];
+
+				var cardInfoParts = cardInfo.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+				Debug.Assert(cardInfoParts.Length == 2);
+				var cardNumber = Convert.ToInt32(cardInfoParts[1]);
 
 				var cardNumbersParts = cardNumbers.Split('|', StringSplitOptions.TrimEntries);
 				Debug.Assert(cardNumbersParts.Length == 2);
@@ -236,9 +242,29 @@ Card 199: 16 23 27 61 14 11 89 80 98 88 | 57 48 25 66 72 45  2 33 93  9 73 58 94
 				Console.WriteLine($"{cardInfo} has {myWinningSetCount} winners ({cardPoints} points)");
 
 				pilePoints += cardPoints;
+				cardWinners.Add(cardNumber, myWinningSetCount);
 			}
 
-			Console.WriteLine($"Solution: {pilePoints}");
+			var scratchCards = new List<int>(cardWinners.Keys);
+			var lastCard = cardWinners.Last().Key;
+			var index = 0;
+			while(index < scratchCards.Count)
+			{
+				var cardNumber = scratchCards[index];
+				var winners = cardWinners[cardNumber];
+				for(int addCard = cardNumber + 1; addCard <= cardNumber + winners; addCard++)
+				{
+					if(addCard <= lastCard)
+					{
+						scratchCards.Add(addCard);
+					}
+				}
+
+				index++;
+			}
+			var scratchCardsCount = scratchCards.Count;
+
+			Console.WriteLine($"Solution: {pilePoints}, {scratchCardsCount}");
 		}
 	}
 }
