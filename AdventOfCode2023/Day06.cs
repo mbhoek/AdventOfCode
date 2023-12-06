@@ -11,8 +11,8 @@ namespace AdventOfCode2023
 			Console.WriteLine("Day 06");
 			Console.WriteLine("------");
 
-			var document = @"Time:        47     84     74     67
-Distance:   207   1394   1209   1014";
+			var document = @"Time:        47847467
+Distance:   207139412091014";
 
 			var documentLines = document.Split(Environment.NewLine);
 			Debug.Assert(documentLines.Length == 2);
