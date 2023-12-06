@@ -239,7 +239,7 @@ humidity-to-location map:
 0 280123413 3244927";
 
 			var maps = new Dictionary<string, List<MapItem>>();
-			var seeds = new List<long>();
+			var seedRanges = new List<long>();
 			var lines = almanac.Split(Environment.NewLine);
 			var lineNumber = 0;
 			while (lineNumber < lines.Length)
@@ -258,7 +258,7 @@ humidity-to-location map:
 				Debug.Assert(lineParts.Length == 2);
 				if (lineParts[0] == "seeds")
 				{
-					seeds = lineParts[1].Split(' ').Select(s => Convert.ToInt64(s)).ToList();
+					seedRanges = lineParts[1].Split(' ').Select(s => Convert.ToInt64(s)).ToList();
 					lineNumber++;
 					continue;
 				}
@@ -293,13 +293,21 @@ humidity-to-location map:
 			}
 
 			var lowestLocation = Int64.MaxValue;
-			foreach (var seed in seeds)
+			int s = 0;
+			while(s < seedRanges.Count)
 			{
-				var mapped = Map("seed", seed);
-				Console.WriteLine(mapped);
-				if (mapped.Category == "location" && mapped.Number < lowestLocation)
+				var seedRangeStart = seedRanges[s++];
+				var seedRangeLength = seedRanges[s++];
+				Console.WriteLine($"Evaluating seed range {seedRangeStart} with length {seedRangeLength}");
+				for(var seed = seedRangeStart; seed < seedRangeStart + seedRangeLength; seed++)
 				{
-					lowestLocation = mapped.Number;
+					var mapped = Map("seed", seed);
+					//Console.WriteLine(mapped);
+					if (mapped.Category == "location" && mapped.Number < lowestLocation)
+					{
+						lowestLocation = mapped.Number;
+						Console.WriteLine($"Found new lowest location {lowestLocation} for seed {seed}");
+					}
 				}
 			}
 
