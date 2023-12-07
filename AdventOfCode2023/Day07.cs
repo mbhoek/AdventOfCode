@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using System.Numerics;
+﻿using System.Diagnostics;
 
 namespace AdventOfCode2023
 {
@@ -1013,7 +1011,7 @@ KT582 616
 9TT93 794";
 
 			var hands = new List<Hand>();
-			foreach(var line in puzzle.Split(Environment.NewLine))
+			foreach (var line in puzzle.Split(Environment.NewLine))
 			{
 				var lineParts = line.Split(' ');
 				Debug.Assert(lineParts.Length == 2);
@@ -1025,7 +1023,7 @@ KT582 616
 
 			hands.Sort(new HandStrengthComparer());
 			var winnings = 0;
-			for(int rank = 1; rank <= hands.Count; rank++)
+			for (int rank = 1; rank <= hands.Count; rank++)
 			{
 				var hand = hands[rank - 1];
 				Console.WriteLine($"Rank {rank}: Hand {hand.Cards} Bid {hand.Bid} Type {hand.Type}");
@@ -1049,9 +1047,33 @@ KT582 616
 					cardCount.Add(card, 1);
 				}
 			}
+			if (cardCount.TryGetValue('J', out int jokers))
+			{
+				cardCount.Remove('J');
+			}
+			if(cardCount.Count == 0)
+			{
+				// all jokers
+				return HandType.FiveOfAKind;
+			}
+
 			var sortedCardCount = cardCount.OrderByDescending(c => c.Value).ToDictionary(c => c.Key, c => c.Value);
 			var cards = sortedCardCount.Keys.ToArray();
 			var counts = sortedCardCount.Values.ToArray();
+			Debug.Assert(cards.Length == counts.Length);
+
+			int joker = 0;
+			while(jokers > 0 && joker < cards.Length)
+			{
+				counts[joker] += jokers;
+				jokers = 0;
+				if (counts[joker] > 5)
+				{
+					jokers = counts[joker] - 5;
+					counts[joker] = 5;
+				}
+				joker++;
+			}
 
 			if (counts[0] == 5)
 			{
@@ -1102,37 +1124,37 @@ KT582 616
 
 	class HandStrengthComparer : Comparer<Hand>
 	{
-		const string CardStrength = "23456789TJQKA";
+		const string CardStrength = "J23456789TQKA";
 
 		public override int Compare(Hand? left, Hand? right)
 		{
-			if(left == null && right == null)
+			if (left == null && right == null)
 			{
 				return 0;
 			}
-			if(left == null)
+			if (left == null)
 			{
 				return -1;
 			}
-			if(right == null)
+			if (right == null)
 			{
 				return 1;
 			}
 
 			var leftType = (int)left.Type;
 			var rightType = (int)right.Type;
-			if(leftType.CompareTo(rightType) != 0)
+			if (leftType.CompareTo(rightType) != 0)
 			{
 				return leftType.CompareTo(rightType);
 			}
 
 			Debug.Assert(left.Cards.Length == right.Cards.Length);
-			for(int c = 0; c < left.Cards.Length; c++)
+			for (int c = 0; c < left.Cards.Length; c++)
 			{
 				var leftCardStrength = CardStrength.IndexOf(left.Cards[c]);
 				var rightCardStrength = CardStrength.IndexOf(right.Cards[c]);
 
-				if(leftCardStrength.CompareTo(rightCardStrength) != 0)
+				if (leftCardStrength.CompareTo(rightCardStrength) != 0)
 				{
 					return leftCardStrength.CompareTo(rightCardStrength);
 				}
