@@ -807,32 +807,67 @@ PJP = (SMR, KKR)";
 				line++;
 			}
 
-			var steps = 0;
-			var location = "AAA";
-			while(location != "ZZZ")
+			var locationList = new List<string>();
+			foreach(var node in network)
 			{
-				foreach(var instruction in instructions)
+				if(node.Key.EndsWith('A'))
 				{
-					steps++;
-					switch(instruction)
+					Console.WriteLine($"Starting location: {node.Key}");
+					locationList.Add(node.Key);
+				}
+			}
+			var locations = locationList.ToArray();
+			Console.WriteLine($"Starting locations: {locations.Length}");
+
+			var steps = new int[locations.Length];
+			for (int loc = 0; loc < locations.Length; loc++)
+			{
+				while (!locations[loc].EndsWith('Z'))
+				{
+					foreach (var instruction in instructions)
 					{
-						case 'L':
-							location = network[location].Left;
+						steps[loc]++;
+						locations[loc] = instruction switch
+						{
+							'L' => network[locations[loc]].Left,
+							'R' => network[locations[loc]].Right,
+							_ => throw new Exception("Invalid instruction"),
+						};
+						if (locations[loc].EndsWith('Z'))
+						{
 							break;
-						case 'R':
-							location = network[location].Right;
-							break;
-						default:
-							throw new Exception("Invalid instruction");
-					}
-					if(location == "ZZZ")
-					{
-						break;
+						}
 					}
 				}
 			}
 
-			Console.WriteLine($"Solution: {steps}");
+			foreach(var step in steps)
+			{
+				Console.WriteLine($"Steps: {step}");
+			}
+			// Now we have steps for each solution, get the greatest common denominator is the first step they 'align'
+			// https://stackoverflow.com/questions/527860/calculate-a-ratio-in-c-sharp/527873
+			var gcd = GCD(steps);
+			Console.WriteLine($"GCD: {gcd}");
+			// Divide the steps by gcd, multiply by themselves is the minimum iteration to 'align'
+			var solution = 1L;
+			foreach(var step in steps)
+			{
+				solution *= (step / gcd);
+			}
+			solution *= gcd;
+
+			Console.WriteLine($"Solution: {solution}");
+		}
+
+		static int GCD(int[] numbers)
+		{
+			return numbers.Aggregate(GCD);
+		}
+
+		static int GCD(int a, int b)
+		{
+			return b == 0 ? a : GCD(b, a % b);
 		}
 
 	}
