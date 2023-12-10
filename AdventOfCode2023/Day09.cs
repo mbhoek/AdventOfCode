@@ -232,7 +232,7 @@ namespace AdventOfCode2023
 				var nextValue = 0;
 				while(stack.Count > 0)
 				{
-					nextValue += stack.Pop().Last();
+					nextValue = stack.Pop().First() - nextValue;
 				}
 				solution += nextValue;
 				Console.WriteLine($"History {history} has next value {nextValue}");
