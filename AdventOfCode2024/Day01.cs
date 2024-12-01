@@ -9,12 +9,82 @@ namespace AdventOfCode2024
 {
     static class Day01
     {
-        internal static void Solve()
+        internal static void Part1()
         {
-            Console.WriteLine("Day 01");
-            Console.WriteLine("------");
+            Console.WriteLine("Day 01, Part 1");
+            Console.WriteLine("--------------");
 
-            var input = @"77710   11556
+            var leftList = new List<int>();
+            var rightList = new List<int>();
+
+            foreach (var line in realInput.Split(Environment.NewLine))
+            {
+                var split = line.Split(' ', 2, StringSplitOptions.TrimEntries);
+                leftList.Add(Convert.ToInt32(split[0]));
+                rightList.Add(Convert.ToInt32(split[1]));
+            }
+            
+            Debug.Assert(leftList.Count == rightList.Count);
+
+            leftList.Sort();
+            rightList.Sort();
+            int totalDistance = 0;
+            for (int iter = 0; iter < leftList.Count; iter++)
+            {
+                totalDistance += Math.Abs(leftList[iter] - rightList[iter]);
+            }
+
+            Console.WriteLine($"Solution: {totalDistance}");
+        }
+
+        internal static void Part2()
+        {
+            Console.WriteLine("Day 01, Part 2");
+            Console.WriteLine("--------------");
+
+            var leftCount = new Dictionary<int, int>();
+            var rightCount = new Dictionary<int, int>();
+
+            foreach(var line in realInput.Split(Environment.NewLine))
+            {
+                var split = line.Split(' ', 2, StringSplitOptions.TrimEntries);
+                AddToCount(leftCount, Convert.ToInt32(split[0]));
+                AddToCount(rightCount, Convert.ToInt32(split[1]));
+            }
+
+            int similarityScore = 0;
+
+            foreach(var kvp in leftCount)
+            {
+                if(rightCount.TryGetValue(kvp.Key, out int rightValue))
+                {
+                    similarityScore += kvp.Key * kvp.Value * rightValue;
+                }
+            }
+
+            Console.WriteLine($"Solution: {similarityScore}");
+
+            static void AddToCount(Dictionary<int, int> count, int number)
+            {
+                if (count.TryGetValue(number, out int value))
+                {
+                    count[number] = ++value;
+                }
+                else
+                {
+                    count.Add(number, 1);
+                }
+            }
+        }
+
+        const string exampleInput = @"3   4
+4   3
+2   5
+1   3
+3   9
+3   3";
+
+        const string realInput = @"77710   11556
 22632   23674
 82229   77288
 35788   30924
@@ -1014,29 +1084,5 @@ namespace AdventOfCode2024
 22063   15281
 63297   43457
 42167   11247";
-
-
-            var leftList = new List<int>();
-            var rightList = new List<int>();
-
-            foreach (var line in input.Split(Environment.NewLine))
-            {
-                var split = line.Split(' ', 2, StringSplitOptions.TrimEntries);
-                leftList.Add(Convert.ToInt32(split[0]));
-                rightList.Add(Convert.ToInt32(split[1]));
-            }
-            
-            Debug.Assert(leftList.Count == rightList.Count);
-
-            leftList.Sort();
-            rightList.Sort();
-            int totalDistance = 0;
-            for (int iter = 0; iter < leftList.Count; iter++)
-            {
-                totalDistance += Math.Abs(leftList[iter] - rightList[iter]);
-            }
-
-            Console.WriteLine($"Solution: {totalDistance}");
-        }
     }
 }
